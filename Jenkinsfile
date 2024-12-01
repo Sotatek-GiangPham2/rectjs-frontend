@@ -5,9 +5,9 @@ def appSourceBranch = 'staging'
 
 def appConfigRepo = 'https://github.com/SotaBox/sotabox_infrastructure.git'
 def appConfigBranch = 'staging'
-def helmRepo = "app-helmchart"
+def helmRepo = "k8s/accounts/stg/config/apps/core/test"
 def helmChart = "app-demo"
-def helmValueFile = "app-demo/app-demo-value.yaml"
+def helmValueFile = "values.yaml"
 
 def dockerhubAccount = 'dockerhub'
 def githubAccount = 'github_source'
@@ -50,22 +50,23 @@ pipeline {
             }
         }
 
-        // stage('Update value in helm-chart') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'github_source', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-        //             sh """#!/bin/bash
-        //                 [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
-        //                 git clone ${appConfigRepo} --branch ${appConfigBranch}
-        //                 cd ${helmRepo}
-        //                 sed -i 's|  tag: .*|  tag: "${IMAGE_TAG}"|' ${helmValueFile}
-        //                 git add .
-        //                 git commit -m "Update to version ${IMAGE_TAG}"
-        //                 git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/SotaBox/sotabox_infrastructure.git
-        //                 cd ..
-        //                 [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Update value in helm-chart') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github_source', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh """#!/bin/bash
+                        [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
+                        git clone ${appConfigRepo} --branch ${appConfigBranch}
+                        cd ${helmRepo}
+                        sed -i 's|  tag: .*|  tag: "${IMAGE_TAG}"|' ${helmValueFile}
+                        sed -i 's/^  tag:.*/  tag: "${IMAGE_TAG}"/'
+                        git add .
+                        git commit -m "Update to version ${IMAGE_TAG}"
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/SotaBox/sotabox_infrastructure.git
+                        cd ..
+                        [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
+                    """
+                }
+            }
+        }
     }
 }
