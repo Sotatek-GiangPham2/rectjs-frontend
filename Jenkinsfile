@@ -41,7 +41,7 @@ pipeline {
                 sh 'pwd'
                 sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
                 withCredentials([file(credentialsId: "credential_gcp", variable: 'GCR_CRED')]) {
-                    sh 'cat "${GCR_CRED}" | docker login -u _json_key_base64 --password-stdin https://${REPO_LOCATION}-docker-docker.pkg.dev'
+                    sh 'cat "${GCR_CRED}" | docker login -u _json_key_base64 --password-stdin https://${REPO_LOCATION}-docker.pkg.dev'
                     sh 'docker push ${IMAGE_NAME}:${IMAGE_TAG}'
                     sh 'docker logout https://${REPO_LOCATION}-docker.pkg.dev'
                 }
