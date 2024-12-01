@@ -21,7 +21,7 @@ pipeline {
         PROJECT = "dev-sota-data-platform"
         APP_NAME = "test"
         REPO_NAME = "sotabox-registry"
-        REPO_LOCATION = "asia-northeast1-docker"
+        REPO_LOCATION = "asia-northeast1"
         IMAGE_NAME = "${REPO_LOCATION}-docker.pkg.dev/${PROJECT}/${REPO_NAME}/${APP_NAME}"
         IMAGE_TAG = "${version}"
     }
