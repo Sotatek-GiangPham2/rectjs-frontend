@@ -3,7 +3,7 @@
 def appSourceRepo = 'https://github.com/Sotatek-GiangPham2/rectjs-frontend.git'
 def appSourceBranch = 'staging'
 
-def appConfigRepo = 'https://github.com/SotaBox/sotabox_infrastructure.git'
+def appConfigRepo = 'github.com/SotaBox/sotabox_infrastructure.git'
 def appConfigBranch = 'staging'
 def helmRepo = "k8s/accounts/stg/config/apps/core/test"
 def helmChart = "app-demo"
@@ -45,7 +45,7 @@ pipeline {
                     sh 'docker push ${IMAGE_NAME}:${IMAGE_TAG}'
                     sh 'docker logout https://${REPO_LOCATION}-docker.pkg.dev'
                 }
-                sh 'docker rmi ${IMAGE_NAME}:${IMAGE_TAG}'
+                // sh 'docker rmi ${IMAGE_NAME}:${IMAGE_TAG}'
                 echo 'Build docker image Finish'
             }
         }
@@ -55,7 +55,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github_source', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """#!/bin/bash
                         [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
-                        git clone ${appConfigRepo} --branch ${appConfigBranch}
+                        git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${appConfigRepo} --branch ${appConfigBranch}
                         cd ${helmRepo}
                         sed -i 's/^  tag:.*/  tag: "${IMAGE_TAG}"/'
                         git add .
