@@ -10,7 +10,7 @@ def helmChart = "app-demo"
 def helmValueFile = "app-demo/app-demo-value.yaml"
 
 def dockerhubAccount = 'dockerhub'
-def githubAccount = 'github'
+def githubAccount = 'github_source'
 
 def version = "v1.${BUILD_NUMBER}"
 
