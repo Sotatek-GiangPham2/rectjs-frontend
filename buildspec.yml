@@ -1,0 +1,40 @@
+  version: 0.2
+  env:
+    shell: bash
+    parameter-store:
+      GITHUB_TOKEN: "GITHUB_TOKEN"
+    variables:
+      REPO_NAME: "rectjs-frontend"
+      BRANCH_NAME: "master"
+      REGION: "us-east-1"
+  phases:
+    install:
+      runtime-versions: 
+        nodejs: 18
+    pre_build:
+      on-failure: ABORT
+      commands:
+      - echo 'Start pre build phase'
+      # - export REPO_NAME=$(jq -r '.repo_name' metadata.json)
+      # - export BRANCH_NAME=$(jq -r '.branch_name' metadata.json)
+      # - export COMMIT_HASH=$(jq -r '.commit_id' metadata.json)
+      - mkdir working_dir && cd working_dir
+      - GITHUB_TOKEN=$(aws ssm get-parameter --with-decryption --name /test/sotaicg-platform/G_TOKEN --region us-east-1 | jq -r '.Parameter.Value')
+      - git clone https://oauth2:$GITHUB_TOKEN@github.com/Trourest186/$REPO_NAME .
+      - git checkout $BRANCH_NAME
+    build:
+      commands:
+      - ls -la
+      - pwd
+      - aws ssm get-parameter --with-decryption --name /test/sotaicg-platform/frontend --region $${AWS_REGION} | jq -r '.Parameter.Value' > .env
+      
+      # - aws ssm get-parameter --with-decryption --name /$${ENV}-$${PROJECT}-be --region $${AWS_REGION} | jq -r '.Parameter.Value' > .env
+      # - aws secretsmanager get-secret-value --secret-id /voy/prod/backend --region us-west-1 | jq -r '.SecretString' | jq -r "to_entries|map(\"\(.key)=\\\"\(.value|tostring)\\\"\")|.[]" > .env
+      - cat .env
+      - npm install --frozen-lockfile
+      - npm run build
+      - echo "----------SYNC FILE TO S3 BUCKET----------------"
+      - aws s3 sync build/ s3://test-sotaicg-platform-storage
+      - echo "----------CLEAR CACHE CLOUDFRONT----------------"
+      - DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[0]=='cdn.trourest186.online'].Id" --output text)
+      - aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
