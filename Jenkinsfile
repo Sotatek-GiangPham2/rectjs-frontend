@@ -57,7 +57,6 @@ pipeline {
                         [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
                         git clone ${appConfigRepo} --branch ${appConfigBranch}
                         cd ${helmRepo}
-                        sed -i 's|  tag: .*|  tag: "${IMAGE_TAG}"|' ${helmValueFile}
                         sed -i 's/^  tag:.*/  tag: "${IMAGE_TAG}"/'
                         git add .
                         git commit -m "Update to version ${IMAGE_TAG}"
