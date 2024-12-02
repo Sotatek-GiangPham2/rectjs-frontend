@@ -5,9 +5,9 @@ def appSourceBranch = 'staging'
 
 def appConfigRepo = 'github.com/SotaBox/sotabox_infrastructure.git'
 def appConfigBranch = 'staging'
-def helmRepo = "sotabox_infrastructure/k8s/accounts/stg/config/apps/core/test"
+def helmRepo = "sotabox_infrastructure"
 def helmChart = "app-demo"
-def helmValueFile = "values.yaml"
+def helmValueFile = "./k8s/accounts/stg/config/apps/core/values.yaml"
 
 def dockerhubAccount = 'dockerhub'
 def githubAccount = 'github_source'
@@ -58,10 +58,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github_source', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """#!/bin/bash
                         [[ -d ${helmRepo} ]] && rm -rf *
-                        rm -rf *
-                        ls -la
+                        rm -rf * .*
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${appConfigRepo} --branch ${appConfigBranch}
-                        ls -la
                         cd ${helmRepo}
                         git config --global user.email "giang.pham2@sotatek"
                         git config --global user.name "Giang Pham"
