@@ -58,7 +58,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github_source', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """#!/bin/bash
                         [[ -d ${helmRepo} ]] && rm -rf *
+                        rm -rf *
+                        ls
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${appConfigRepo} --branch ${appConfigBranch}
+                        ls
                         cd ${helmRepo}
                         sed -i 's/^  tag:.*/  tag: ${IMAGE_TAG}/' ${helmValueFile}
                         git add .
