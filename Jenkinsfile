@@ -5,7 +5,7 @@ def appSourceBranch = 'staging'
 
 def appConfigRepo = 'github.com/SotaBox/sotabox_infrastructure.git'
 def appConfigBranch = 'staging'
-def helmRepo = "k8s/accounts/stg/config/apps/core/test"
+def helmRepo = "sotabox_infrastructure/k8s/accounts/stg/config/apps/core/test"
 def helmChart = "app-demo"
 def helmValueFile = "values.yaml"
 
@@ -57,7 +57,7 @@ pipeline {
                         [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${appConfigRepo} --branch ${appConfigBranch}
                         cd ${helmRepo}
-                        sed -i 's/^  tag:.*/  tag: "${IMAGE_TAG}"/'
+                        sed -i 's/^  tag:.*/  tag: ${IMAGE_TAG}/' ${helmValueFile}
                         git add .
                         git commit -m "Update to version ${IMAGE_TAG}"
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/SotaBox/sotabox_infrastructure.git
