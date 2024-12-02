@@ -42,7 +42,7 @@ pipeline {
                 sh 'pwd'
                 sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
                 withCredentials([file(credentialsId: "credential_gcp", variable: 'GCR_CRED')]) {
-                    sh 'cat "${GCR_CRED}" | docker login -u _json_key_base64 --password-stdin https://${REPO_LOCATION}-docker-docker.pkg.dev'
+                    sh 'cat "${GCR_CRED} | base64" | docker login -u _json_key_base64 --password-stdin https://${REPO_LOCATION}-docker.pkg.dev'
                     sh 'docker push ${IMAGE_NAME}:${IMAGE_TAG}'
                     sh 'docker logout https://${REPO_LOCATION}-docker.pkg.dev'
                 }
@@ -55,7 +55,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github_source', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """#!/bin/bash
-                        [[ -d ${helmRepo} ]] && rm -rf ${helmRepo}
+                        [[ -d ${helmRepo} ]] && rm -rf *
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${appConfigRepo} --branch ${appConfigBranch}
                         cd ${helmRepo}
                         sed -i 's/^  tag:.*/  tag: ${IMAGE_TAG}/' ${helmValueFile}
