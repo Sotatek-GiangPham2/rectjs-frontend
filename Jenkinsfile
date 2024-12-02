@@ -1,4 +1,4 @@
-// Jenkinsfile for building and deploying React.js fronten
+// Jenkinsfile for building and deploying React.js frontent
 
 def appSourceRepo = 'https://github.com/Sotatek-GiangPham2/rectjs-frontend.git'
 def appSourceBranch = 'staging'
