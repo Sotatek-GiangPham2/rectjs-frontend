@@ -59,10 +59,12 @@ pipeline {
                     sh """#!/bin/bash
                         [[ -d ${helmRepo} ]] && rm -rf *
                         rm -rf *
-                        ls
+                        ls -la
                         git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${appConfigRepo} --branch ${appConfigBranch}
-                        ls
+                        ls -la
                         cd ${helmRepo}
+                        git config --global user.email "giang.pham2@sotatek"
+                        git config --global user.name "Giang Pham"
                         sed -i 's/^  tag:.*/  tag: ${IMAGE_TAG}/' ${helmValueFile}
                         git add .
                         git commit -m "Update to version ${IMAGE_TAG}"
